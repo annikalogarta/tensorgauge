@@ -1,15 +1,16 @@
-param([ValidateSet('software', 'rtl', 'all', 'demo', 'emit')][string]$Mode = 'software')
+param([ValidateSet('software', 'rtl', 'all', 'demo', 'emit', 'evaluation')][string]$Mode = 'software')
 
 $ErrorActionPreference = 'Stop'
 $taskRoot = Split-Path -Parent $PSScriptRoot
-$software = 'testOnly tensorgauge.fp4.E2M1Spec tensorgauge.fp4.FP4GemmReferenceSpec tensorgauge.fp4.FP4ElaborationSpec'
-$rtl = 'testOnly tensorgauge.fp4.FP4RTLSpec tensorgauge.fp4.FP4GemmRTLSpec'
+$software = 'testOnly tensorgauge.fp4.E2M1Spec tensorgauge.fp4.FP4GemmReferenceSpec tensorgauge.fp4.FP4ElaborationSpec tensorgauge.fp4.FP4GemmEvaluationSpec'
+$rtl = 'testOnly tensorgauge.fp4.FP4RTLSpec tensorgauge.fp4.FP4GemmRTLSpec tensorgauge.fp4.FP4GemmEvaluationRTLSpec'
 $tasks = switch ($Mode) {
     'software' { @($software) }
     'rtl' { @($rtl) }
     'all' { @($software, $rtl) }
     'demo' { @('runMain tensorgauge.fp4.RunFP4Gemm') }
     'emit' { @('runMain tensorgauge.EmitDotProducts --systemverilog') }
+    'evaluation' { @('runMain tensorgauge.fp4.RunFP4GemmEvaluation') }
 }
 if ($Mode -in @('rtl', 'all')) {
     foreach ($tool in @('verilator', 'g++', 'make', 'which')) {
