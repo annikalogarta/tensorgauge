@@ -38,4 +38,16 @@ class FP4ElaborationSpec extends AnyFreeSpec {
       intercept[IllegalArgumentException](ChiselStage.emitCHIRRTL(new FP4Gemm(m, n, k)))
     }
   }
+
+  "mixed-precision dot-add elaborates at narrow and full-retention widths" in {
+    Seq((1, 0), (4, 7), (8, 24), (4, 160)).foreach { case (k, p) =>
+      assert(ChiselStage.emitCHIRRTL(new FP4DotAdd(k, p)).contains(s"module FP4DotAdd_K${k}_F$p"))
+    }
+  }
+
+  "unsupported dot-add dimensions and precision are rejected" in {
+    Seq((0, 0), (65, 0), (4, -1), (4, 161)).foreach { case (k, p) =>
+      intercept[IllegalArgumentException](ChiselStage.emitCHIRRTL(new FP4DotAdd(k, p)))
+    }
+  }
 }

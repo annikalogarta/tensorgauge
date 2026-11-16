@@ -3,8 +3,8 @@ set -euo pipefail
 
 task_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 mode="${1:-software}"
-software='testOnly tensorgauge.fp4.E2M1Spec tensorgauge.fp4.FP4GemmReferenceSpec tensorgauge.fp4.FP4ElaborationSpec tensorgauge.fp4.FP4GemmEvaluationSpec'
-rtl='testOnly tensorgauge.fp4.FP4RTLSpec tensorgauge.fp4.FP4GemmRTLSpec tensorgauge.fp4.FP4GemmEvaluationRTLSpec'
+software='testOnly tensorgauge.fp4.E2M1Spec tensorgauge.fp4.FP4GemmReferenceSpec tensorgauge.fp4.FP4ElaborationSpec tensorgauge.fp4.FP4GemmEvaluationSpec tensorgauge.fp4.FP4DotAddReferenceSpec tensorgauge.fp4.FP4DotAddStudySpec'
+rtl='testOnly tensorgauge.fp4.FP4RTLSpec tensorgauge.fp4.FP4GemmRTLSpec tensorgauge.fp4.FP4GemmEvaluationRTLSpec tensorgauge.fp4.FP4DotAddRTLSpec'
 case "$mode" in
   software) tasks=("$software") ;;
   rtl) tasks=("$rtl") ;;
@@ -12,7 +12,8 @@ case "$mode" in
   demo) tasks=('runMain tensorgauge.fp4.RunFP4Gemm') ;;
   emit) tasks=('runMain tensorgauge.EmitDotProducts --systemverilog') ;;
   evaluation) tasks=('runMain tensorgauge.fp4.RunFP4GemmEvaluation') ;;
-  *) echo 'Usage: bash scripts/check.sh [software|rtl|all|demo|emit|evaluation]' >&2; exit 2 ;;
+  precision) tasks=('runMain tensorgauge.fp4.RunFP4DotAddStudy') ;;
+  *) echo 'Usage: bash scripts/check.sh [software|rtl|all|demo|emit|evaluation|precision]' >&2; exit 2 ;;
 esac
 
 if [[ "$mode" == rtl || "$mode" == all ]]; then
