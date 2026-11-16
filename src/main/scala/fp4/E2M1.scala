@@ -30,7 +30,9 @@ object E2M1 {
     */
   def encode(value: BigDecimal): Int = {
     val magnitude = value.abs
-    val code = (0 until 8).minBy { candidate =>
+    // Clamp first: for extreme host values, decimal context rounding can make
+    // all candidate distances look identical and otherwise incorrectly pick 0.
+    val code = if (magnitude >= BigDecimal(6)) 7 else (0 until 8).minBy { candidate =>
       ((decode(candidate) - magnitude).abs, candidate & 1)
     }
     if (value.signum < 0 && code != 0) code | 8 else code

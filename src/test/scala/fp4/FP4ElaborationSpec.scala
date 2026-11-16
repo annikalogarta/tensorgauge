@@ -24,4 +24,18 @@ class FP4ElaborationSpec extends AnyFreeSpec {
   "zero-lane dot products are rejected" in {
     intercept[IllegalArgumentException](ChiselStage.emitCHIRRTL(new FP4DotProduct(0)))
   }
+
+  "GEMM elaborates for scalar, rectangular, and matrix-vector shapes" in {
+    Seq((1, 1, 1), (2, 2, 3), (2, 3, 4), (3, 1, 2), (1, 3, 2)).foreach {
+      case (m, n, k) =>
+        val ir = ChiselStage.emitCHIRRTL(new FP4Gemm(m, n, k))
+        assert(ir.contains(s"module FP4Gemm_M${m}_N${n}_K$k"))
+    }
+  }
+
+  "nonpositive GEMM dimensions are rejected" in {
+    Seq((0, 1, 1), (1, 0, 1), (1, 1, 0), (-1, 2, 3)).foreach { case (m, n, k) =>
+      intercept[IllegalArgumentException](ChiselStage.emitCHIRRTL(new FP4Gemm(m, n, k)))
+    }
+  }
 }

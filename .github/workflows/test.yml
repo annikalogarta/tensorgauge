@@ -14,20 +14,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Cleanup
-        run: sed -i "s/%NAME%/test/g" build.mill
       - name: Cache Scala
         uses: coursier/cache-action@v6
       - name: Setup Scala
         uses: coursier/setup-action@v1
         with:
-          jvm: adopt:11
+          jvm: temurin:17
           apps: sbt
       - name: Setup Dependencies
         run: |
-          sudo apt-get install verilator
+          sudo apt-get update
+          sudo apt-get install -y verilator build-essential
           verilator --version
-      - name: SBT Test
-        run: sbt test
+      - name: FP4 software and RTL tests
+        run: bash scripts/check.sh all
       - name: mill Test
         run: ./mill _.test
+      - name: Save test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-linux
+          path: |
+            reports/check-*.log
+            target/test-reports/*.xml

@@ -43,6 +43,10 @@ class E2M1Spec extends AnyFreeSpec {
   "conversion saturates, preserves underflow sign, and rejects nonfinite inputs" in {
     assert(E2M1.fromDouble(100) == 7)
     assert(E2M1.fromDouble(-100) == 15)
+    assert(E2M1.fromDouble(Double.MaxValue) == 7)
+    assert(E2M1.fromDouble(-Double.MaxValue) == 15)
+    assert(E2M1.encode(BigDecimal("1e1000")) == 7)
+    assert(E2M1.encode(BigDecimal("-1e1000")) == 15)
     assert(E2M1.fromDouble(-0.1) == 8)
     assert(E2M1.fromDouble(0.1) == 0)
     Seq(Double.NaN, Double.PositiveInfinity, Double.NegativeInfinity).foreach { x =>

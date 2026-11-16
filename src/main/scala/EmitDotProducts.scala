@@ -28,4 +28,7 @@ object EmitDotProducts extends App {
   emit("FP4Multiply", new FP4Multiply)
   emit("FP4FMA", new FP4FMA)
   Seq(1, 4, 8).foreach(k => emit(s"FP4DotProduct_K$k", new FP4DotProduct(k)))
+  Seq((1, 1, 1), (2, 2, 3), (2, 3, 4)).foreach { case (m, n, k) =>
+    emit(s"FP4Gemm_M${m}_N${n}_K$k", new FP4Gemm(m, n, k))
+  }
 }
